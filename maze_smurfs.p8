@@ -1,133 +1,43 @@
 pico-8 cartridge // http://www.pico-8.com
 version 15
 __lua__
--- mazes generator & solver
--- by mrben
+-- smurf maze
+-- by m0d, based on work by mrben
 
 -- global variable
 maze_width = 21  -- width of the maze
 maze_height =21  -- heigh of the maze
-cell_size =6  -- size of a cell
+cell_size = 6  -- size of a cell
 maze_width = 10  -- width of the maze
 maze_height =10  -- heigh of the maze
 cell_size = 12  -- size of a cell
 smurf = {}
-color={bg=0,
-    maze=7,
-    path=8}
+color = {
+  bg=0,
+  maze=7,
+  path=8
+}
 
 function _init()
-    rectfill(0,0,127,127,color.bg)
-    pset(127,127,8)
-
-    m={}
-    for i=1,maze_width* maze_height do add(m,-1) end
-
-    local rectangle ={x=0,y=0,w=maze_width,h= maze_height }
-    rect(px(rectangle,0),py(rectangle,0),
-        px(rectangle, rectangle.w),py(rectangle, rectangle.h),
-        color.maze)
-
-    local door
-    -- create door: 1 - right, 2 - top, 3 - bottom, 0 - left
-    which_side = flr(rnd(4))
-    -- door at one of the sides.
-    if which_side < 2 then
-        door = {
-          x = maze_width * (which_side % 2),
-          y = flr(rnd(maze_height))
-        }
-        line(
-          px(rectangle, door.x),
-          py(rectangle, door.y) + 1,
-          px(rectangle, door.x),
-          py(rectangle, door.y + 1) - 1,
-          color.bg
-        )
-        -- print smurf
-        smurf.x = door.x * cell_size + 5 * (-1 * (which_side % 2) +1 * ((which_side + 1) % 2))
-        smurf.y = door.y * cell_size + 5
-        -- spr(1, smurf.x, smurf.y)
-        which_side = (which_side + 1) % 2
-        door = {
-          x = maze_width * (which_side % 2),
-          y = flr(rnd(maze_height))
-        }
-        line(
-          px(rectangle, door.x),
-          py(rectangle, door.y) + 1,
-          px(rectangle, door.x),
-          py(rectangle, door.y + 1) - 1,
-          color.bg
-        )
-    -- door at top
-    else
-        door = {
-          x = flr(rnd(maze_width)),
-          y = (maze_height - 1) * (which_side % 2)
-        }
-        line(
-          px(rectangle, door.x) + 1,
-          py(rectangle, door.y + (which_side % 2)),
-          px(rectangle, door.x + 1) - 1,
-          py(rectangle, door.y + (which_side % 2)),
-            color.bg)
-        -- print smurf
-        smurf.x = door.x * cell_size + 5
-        smurf.y = door.y * cell_size + 5 + (-1 * (which_side % 2) + 1 * ((which_side + 1) % 2))
-        -- spr(1, smurf.x, smurf.y)
-
-        which_side = 2 + (which_side + 1) % 2
-        door = {
-          x = flr(rnd(maze_width)),
-          y = (maze_height - 1) * (which_side % 2)
-        }
-        line(
-          px(rectangle, door.x) + 1,
-          py(rectangle, door.y + (which_side % 2)),
-          px(rectangle, door.x + 1) - 1,
-          py(rectangle, door.y + (which_side % 2)),
-            color.bg)
-
-    end
-
-    -- start.
-    state = 0
-
-    -- for step by step
-    calls={}
-    add(calls,{ rectangle, door,m})
-    auto=false
-    speed=maze_width* maze_height
-    -- for path display
-    toggle=false
-    pos=maze_width*flr(maze_height /2)+flr(maze_width/2)
+  generate_maze()
 end
 
 function _update()
+  print(flr(time(), 1), 0, 0, 7)
     if state < 2 then
         for i=1,speed do
             if state == 0 then
                 if btnp(4) then
-                    auto=true
                     state=1
                 end
-            elseif state == 1 then
-                if (btnp(4)) then
-                    speed=maze_width* maze_height
-                end
-                -- if (btnp(5)) speed=speed*1.2
-                end
+            end
 
                 if #calls > 0 then
-                    -- if btnp(5) or auto then
-                        submaze = calls[#calls]
-                        gen(submaze[1],submaze[2],submaze[3])
-                        del(calls,submaze)
-                    -- end
+                  submaze = calls[#calls]
+                  gen(submaze[1],submaze[2],submaze[3])
+                  del(calls,submaze)
                 else
                     state=2
-                    pset(127,127,11)
                     break
                 end
             end
@@ -159,7 +69,7 @@ function _update()
         end
       end
         if (btnp(4)) then
-            _init()
+            generate_maze()
         end
     end
     spr(1, smurf.x, smurf.y)
@@ -287,6 +197,92 @@ function gen(r,e,m)
             px(r,door+1)-1,py(r,wall),
             color.bg)
     end
+end
+
+function generate_maze()
+  rectfill(0,0,127,127,color.bg)
+
+  m={}
+  for i=1,maze_width* maze_height do add(m,-1) end
+
+  local rectangle ={x=0,y=0,w=maze_width,h= maze_height }
+  rect(px(rectangle,0),py(rectangle,0),
+      px(rectangle, rectangle.w),py(rectangle, rectangle.h),
+      color.maze)
+
+  local door
+  -- create door: 1 - right, 2 - top, 3 - bottom, 0 - left
+  which_side = flr(rnd(4))
+  -- door at one of the sides.
+  if which_side < 2 then
+      door = {
+        x = maze_width * (which_side % 2),
+        y = flr(rnd(maze_height))
+      }
+      line(
+        px(rectangle, door.x),
+        py(rectangle, door.y) + 1,
+        px(rectangle, door.x),
+        py(rectangle, door.y + 1) - 1,
+        color.bg
+      )
+      -- print smurf
+      smurf.x = door.x * cell_size + 5 * (-1 * (which_side % 2) +1 * ((which_side + 1) % 2))
+      smurf.y = door.y * cell_size + 5
+      -- spr(1, smurf.x, smurf.y)
+      which_side = (which_side + 1) % 2
+      door = {
+        x = maze_width * (which_side % 2),
+        y = flr(rnd(maze_height))
+      }
+      line(
+        px(rectangle, door.x),
+        py(rectangle, door.y) + 1,
+        px(rectangle, door.x),
+        py(rectangle, door.y + 1) - 1,
+        color.bg
+      )
+  -- door at top
+  else
+      door = {
+        x = flr(rnd(maze_width)),
+        y = (maze_height - 1) * (which_side % 2)
+      }
+      line(
+        px(rectangle, door.x) + 1,
+        py(rectangle, door.y + (which_side % 2)),
+        px(rectangle, door.x + 1) - 1,
+        py(rectangle, door.y + (which_side % 2)),
+          color.bg)
+      -- print smurf
+      smurf.x = door.x * cell_size + 5
+      smurf.y = door.y * cell_size + 5 + (-1 * (which_side % 2) + 1 * ((which_side + 1) % 2))
+      -- spr(1, smurf.x, smurf.y)
+
+      which_side = 2 + (which_side + 1) % 2
+      door = {
+        x = flr(rnd(maze_width)),
+        y = (maze_height - 1) * (which_side % 2)
+      }
+      line(
+        px(rectangle, door.x) + 1,
+        py(rectangle, door.y + (which_side % 2)),
+        px(rectangle, door.x + 1) - 1,
+        py(rectangle, door.y + (which_side % 2)),
+          color.bg)
+
+  end
+
+  -- start.
+  state = 0
+
+  -- for step by step
+  calls={}
+  add(calls,{ rectangle, door,m})
+  speed=maze_width* maze_height
+  -- for path display
+  toggle=false
+  pos=maze_width*flr(maze_height /2)+flr(maze_width/2)
 end
 
 -- place functions
