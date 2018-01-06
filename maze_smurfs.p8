@@ -11,7 +11,9 @@ cell_size = 6  -- size of a cell
 maze_width = 10  -- width of the maze
 maze_height =10  -- heigh of the maze
 cell_size = 12  -- size of a cell
-smurf = {}
+smurf = {
+  flip = false
+}
 color = {
   bg=0,
   maze=7,
@@ -47,12 +49,14 @@ function _update()
         if (can_move(0, smurf)) then
           delete_smurf()
           smurf.x = smurf.x - cell_size
+          smurf.flip = true
         end
       end
       if (btnp(1)) then
         if (can_move(1, smurf)) then
           delete_smurf()
           smurf.x = smurf.x + cell_size
+          smurf.flip = false
         end
       end
 
@@ -72,7 +76,7 @@ function _update()
             generate_maze()
         end
     end
-    spr(1, smurf.x, smurf.y)
+    spr(1, smurf.x, smurf.y, 1, 1, smurf.flip)
 end
 
 function can_move(btn, smurf)
