@@ -25,7 +25,7 @@ function _init()
 end
 
 function _update()
-  print(flr(time(), 1), 0, 0, 7)
+  -- print(flr(time(), 1), 0, 0, 7)
     if state < 2 then
         for i=1,speed do
             if state == 0 then
@@ -50,6 +50,8 @@ function _update()
           delete_smurf()
           smurf.x = smurf.x - cell_size
           smurf.flip = true
+          sfx(0)
+          if (smurf.x < 0) _init()
         end
       end
       if (btnp(1)) then
@@ -57,6 +59,8 @@ function _update()
           delete_smurf()
           smurf.x = smurf.x + cell_size
           smurf.flip = false
+          sfx(0)
+          if (smurf.x > 120) _init()
         end
       end
 
@@ -64,12 +68,16 @@ function _update()
         if (can_move(2, smurf)) then
           delete_smurf()
           smurf.y = smurf.y - cell_size
+          sfx(0)
+          if (smurf.y < 0) _init()
         end
       end
       if (btnp(3)) then
         if (can_move(3, smurf)) then
           delete_smurf()
           smurf.y = smurf.y + cell_size
+          sfx(0)
+          if (smurf.y > 120) _init()
         end
       end
         if (btnp(4)) then
@@ -223,13 +231,6 @@ function generate_maze()
         x = maze_width * (which_side % 2),
         y = flr(rnd(maze_height))
       }
-      line(
-        px(rectangle, door.x),
-        py(rectangle, door.y) + 1,
-        px(rectangle, door.x),
-        py(rectangle, door.y + 1) - 1,
-        color.bg
-      )
       -- print smurf
       smurf.x = door.x * cell_size + 5 * (-1 * (which_side % 2) +1 * ((which_side + 1) % 2))
       smurf.y = door.y * cell_size + 5
@@ -252,12 +253,6 @@ function generate_maze()
         x = flr(rnd(maze_width)),
         y = (maze_height - 1) * (which_side % 2)
       }
-      line(
-        px(rectangle, door.x) + 1,
-        py(rectangle, door.y + (which_side % 2)),
-        px(rectangle, door.x + 1) - 1,
-        py(rectangle, door.y + (which_side % 2)),
-          color.bg)
       -- print smurf
       smurf.x = door.x * cell_size + 5
       smurf.y = door.y * cell_size + 5 + (-1 * (which_side % 2) + 1 * ((which_side + 1) % 2))
@@ -316,3 +311,5 @@ __gfx__
 0000000000ccccc000ccccc000ccccc008fffff00fffff8088fffff8083333800000000000000000000000000000000000000000000000000000000000000000
 000000000c7777000c7777000c777700073333000033337008f1ff10003333000000000000000000000000000000000000000000000000000000000000000000
 00000000007007000007007007007000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+__sfx__
+000100002505000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
